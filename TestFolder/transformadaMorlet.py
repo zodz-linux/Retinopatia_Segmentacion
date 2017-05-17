@@ -27,7 +27,6 @@ class CVGaborProcessedImage(object):
         #     theta = 15 degrees, scale = 3.0, epsilon = 4.0, k0 = 3.0
         wavelet = self.morlet(waveletSize, waveletSize, self.theta,
             self.scale, self.epsilon, 0.0, self.k0y)
-
         # Generate the corresponding wavelet image in the frequency domain
         (wavelet_width, wavelet_height) = wavelet.shape
         dft_A = np.zeros((dft_M, dft_N), dtype='complex')
@@ -38,10 +37,22 @@ class CVGaborProcessedImage(object):
             wavelet[0:wavelet_height, 0:wavelet_width]
         dft_A = np.fft.fft2(dft_A) #, [(wavelet_height + dft_M) / 2, (wavelet_width + dft_N) / 2])
         dft_A_shift = np.fft.fftshift(dft_A)
+        #v2.imshow("dft_A",dft_A.real)
+        cv2.imwrite("dft_B.png",dft_B.real)
+        cv2.imwrite("dft_B_imaginaria.png",dft_B.imag)
+
+        #cv2.waitKey(0)
+        #cv2.imshow("dft_A_shift",dft_A_shift.real)
+        cv2.imwrite("dft_B_shift.png",dft_B_shift.real)
+        cv2.imwrite("dft_B_shift_imaginaria.png",dft_B_shift.imag)
+        #cv2.waitKey(0)
+
 
         # Multiply the source image and the wavelet image in the frequency domain
         current = np.zeros((dft_M, dft_N), dtype='complex')
         current = dft_B * np.conjugate(dft_A)
+        #cv2.imwrite("dft_A.png",dft_A.real)
+
         # cv2.mulSpectrums(np.array(np.dstack([dft_B.real,dft_B.imag])),
         #                  np.array(np.dstack([dft_A.real, dft_A.imag])), 0,
         #                  np.array(np.dstack([current.real, current.imag])), conjB=True)
@@ -74,7 +85,7 @@ class CVGaborProcessedImage(object):
                 if modulus > 1e-7:
                     break
 
-            if j == width:
+            if j == width-1:
                 countRows += 1
 
             if modulus > 1e-7:
@@ -91,7 +102,7 @@ class CVGaborProcessedImage(object):
                 if modulus > 1e-7:
                     break
 
-            if i == height: 
+            if i == height-1:
                 countCols += 1
 
             if modulus > 1e-7:
