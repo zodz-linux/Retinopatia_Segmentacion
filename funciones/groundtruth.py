@@ -2,12 +2,11 @@ import xml.etree.ElementTree as ET
 import os
 
 def XML2Table(xml_data):
-    tree = ET.parse(xml_data)          #Leer  arbol xml
+    tree = ET.parse(xml_data)#Leer  arbol xml
     tmp1,tmp2=[],[] #listas temporales
     for node  in tree.iter("marking"): #Vamos  iterar sobre todos los  marcadores
         lesionLocal=["",[],[],[],[],"",""]#Para cada marcador vamos a buscar los elementos
         for  subchild01 in node.getchildren():
-
             #Iterando en la primera Capa
             if subchild01.tag == "polygonregion" or subchild01.tag == "circleregion":
                 lesionLocal[0]=str(subchild01.tag) #agregamos el tipo de lesion
@@ -41,7 +40,7 @@ def XML2Table(xml_data):
     ImageObservation=tmp1[:]+tmp2[:]
     return ImageObservation
 
-def TablaDeLesiones(FIle):
+def TablaDeLesiones(file):
     f_in_list=[f for f in os.listdir("GroundTruth") if ".xml" in f]
     f_in_list.sort()
     table=[]

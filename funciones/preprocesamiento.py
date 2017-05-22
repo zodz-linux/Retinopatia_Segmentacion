@@ -1,6 +1,5 @@
 #!/usr/bin/python
 import cv2
-import os
 import numpy as np
 
 def build_filters():
@@ -19,16 +18,20 @@ def process(img, filters):
         np.maximum(accum, fimg, accum)
     return accum
 
-def ApplyMask(image,mask):
-    mask=mask[:,:,1]              #cargar capa
-    img2=image.copy()
-    img = cv2.bitwise_and(img2,img2,mask = mask) #enmascarar imagen
+def ApplyMask(image):
+    mask = cv2.imread('mask1.png') #cargar mascara
+    mask = mask[:, :, 1]    # Load mask
+    #image = image[:, :, 1]  # Take green layer
+    img2 = image.copy()
+    img2 = 255 - img2
+    img = cv2.bitwise_and(img2, img2, mask = mask) # Maskingaxxxxxxx
     return img
 
 def preprocesar(img):
     mask1 = cv2.imread('mask1.png') #cargar mascara
     mask2 = cv2.imread('mask2.png') #cargar mascara
-    img=img[:,:,1]                #tomar capa verde
+    mask1 = mask1[:,:,1]
+    mask2 = mask2[:,:,1]
     img = (255-img)               #aplicar negativo
     filters = build_filters()     #construir filtro
     img =ApplyMask(img,mask1)     #enmascarar imagen
