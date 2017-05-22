@@ -16,22 +16,17 @@ mask = cv2.imread('mask.png')   # Load mask
 out = ApplyMask(img, mask)
 cv2.imwrite("enmascaradaEinvertida.png", out)
 
-scale = 3.0;
-epsilon = 4.0;
-theta = np.pi / 12 # 15 degrees
-k0y = 3.0;
+scale = 4.0
+epsilon = 4.0
+k0y = 3.0
 
-cvgpi = CVGaborProcessedImage(scale, epsilon, theta, k0y)
+cvgpi = CVGaborProcessedImage(scale, epsilon, k0y)
 wavelet = cvgpi.generate(out)
 cv2.imshow("Morlet wavelet - Real part", wavelet.real)
 cv2.imwrite("Morlet wavelet - Real part.png", wavelet.real)
 cv2.waitKey(0)
+#print('Min = ', np.min(wavelet.real))
+#print('Max = ', np.max(wavelet.real))
 cv2.imshow("Morlet wavelet - Imaginary part", wavelet.imag)
 cv2.imwrite("Morlet wavelet - Imaginary part.png", wavelet.imag)
 cv2.waitKey(0)
-
-#mi_min = np.min(mi)
-#mi_max = np.max(mi)
-#mi = 255 * (mi - mi_min) / (mi_max - mi_min)
-#mi = mi - np.min(mi)
-#mi = mi / np.max(mi)
