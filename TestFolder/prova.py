@@ -11,27 +11,25 @@ def ApplyMask(image, mask):
     img = cv2.bitwise_and(img2, img2, mask = mask) # Maskingaxxxxxxx
     return img
 
-img = cv2.imread('imagen1.png')
+img = cv2.imread('diaretdb1_image003.png')
+#img = cv2.imread('02_test.tif')
 mask = cv2.imread('mask.png')   # Load mask
+#mask = cv2.imread('02_test_mask.png')
 out = ApplyMask(img, mask)
 cv2.imwrite("enmascaradaEinvertida.png", out)
 
-scale = 3.0;
-epsilon = 4.0;
-theta = np.pi / 12 # 15 degrees
-k0y = 3.0;
 
-cvgpi = CVGaborProcessedImage(scale, epsilon, theta, k0y)
+#maski = cv2.imread('maski.png')   # Load inverted mask
+#maski = (maski[:, :, 0] + maski[:, :, 1] + maski[:, :, 2]) / 3.0
+#out = out + maski
+#cv2.imwrite("Con-maski.png", out)
+
+
+scale = 8.0
+epsilon = 4.0
+k0y = 3.0
+out = out / 255.0
+cvgpi = CVGaborProcessedImage(scale, epsilon, k0y)
 wavelet = cvgpi.generate(out)
-cv2.imshow("Morlet wavelet - Real part", wavelet.real)
-cv2.imwrite("Morlet wavelet - Real part.png", wavelet.real)
-cv2.waitKey(0)
-cv2.imshow("Morlet wavelet - Imaginary part", wavelet.imag)
-cv2.imwrite("Morlet wavelet - Imaginary part.png", wavelet.imag)
-cv2.waitKey(0)
-
-#mi_min = np.min(mi)
-#mi_max = np.max(mi)
-#mi = 255 * (mi - mi_min) / (mi_max - mi_min)
-#mi = mi - np.min(mi)
-#mi = mi / np.max(mi)
+print('Min = {}, max = {}'.format(np.min(wavelet.real), np.max(wavelet.real)))
+cv2.imwrite("Morlet wavelet - Real part.png", wavelet.real * 255.0)

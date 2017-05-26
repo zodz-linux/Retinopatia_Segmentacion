@@ -14,24 +14,33 @@ outPathLesion=(os.getcwd()+"/OutputImages/Lesions/")
 imagesPath   =(os.getcwd()+"/imagenes/")
 ############################
 
-def SegmentarVasos(imagen):
+def SegmentarVasos(imagen,threshold=140):
     print "\n\t\t*Funcion: Segmentar Vasos ..."
     img= cv2.imread(imagesPath+imagen) # Cargar Imagen
     img=img[:,:,1] # Tomar la Capa Verde
-    threshold=140
+    threshold=120
     out = ApplyMask(img)
-    cv2.imwrite("enmascaradaEinvertida.png", out)
+    #cv2.imwrite("enmascaradaEinvertida.png", out)
 
     """
     Parametros de la funcion Morlet
     """
-    scale = 4.0
+    scale = 6.0
     epsilon = 4.0
     k0y = 3.0
     cvgpi = CVGaborProcessedImage(scale, epsilon, k0y)
+    """"""
+
     print " \tPreprocesando        "+imagen
     wavelet = cvgpi.generate(out)
+
+    mask = cv2.imread('mask1.png') #cargar mascara
+    mask = mask[:, :, 1]    # Load mask
+    wavelet = cv2.bitwise_and(wavelet.real, wavelet.real, mask = mask) # Maskingaxxxxxxx
+
+
     cv2.imwrite(outPath+imagen[:-4]+"_1Preprocesada.png",wavelet.real)
+
 
     print " \tUmbralizacion        "+imagen
     thresholded = Thresholding(wavelet.real,threshold)

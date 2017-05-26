@@ -31,10 +31,10 @@ class CVGaborProcessedImage(object):
                   np.ones((dft_M, dft_N), dtype='float32')
         iMaximum = np.zeros((dft_M, dft_N), dtype='float32')
 
-        for multiplier in xrange(18):
+        for i in xrange(18):
 
             # Generate the wavelet complex image
-            angle = multiplier * 10.0 # in degrees
+            angle = i * 10.0 # in degrees
 
             print('Morlet (scale = {}, epsilon = {}, theta = {}, k0 = [0, {}])'.
                   format(self.scale, self.epsilon, angle, self.k0y))
@@ -76,19 +76,6 @@ class CVGaborProcessedImage(object):
                     # Store the maximum of the modulus on this pixel
                     if iCurrent[i][j].real > iMaximum[i][j]:
                         iMaximum[i][j] = iCurrent[i][j].real
-
-        avg = np.mean(iMaximum)
-        stddev = np.std(iMaximum)
-        for i in xrange(current_height):
-            for j in xrange(current_width):
-                iMaximum[i][j] = (iMaximum[i][j] - avg) / stddev
-
-        minimum = np.min(iMaximum)
-        maximum = np.max(iMaximum)
-        for i in xrange(current_height):
-            for j in xrange(current_width):
-                iMaximum[i][j] = (iMaximum[i][j] - minimum) / (maximum - minimum)
-
 
         # Shifts the resulting image to obtain the correct image
         iMaximum = np.fft.fftshift(iMaximum)
