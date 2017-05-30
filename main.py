@@ -11,7 +11,7 @@ from funciones.preprocesamiento import *
 ########## Varibles Globales
 outPath      =(os.getcwd()+"/OutputImages/")
 outPathLesion=(os.getcwd()+"/OutputImages/Lesions/")
-imagesPath   =(os.getcwd()+"/imagenes/")
+imagesPath   =(os.getcwd()+"/images/")
 ############################
 
 def SegmentarVasos(imagen,threshold=140):
