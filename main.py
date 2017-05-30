@@ -20,7 +20,6 @@ def SegmentarVasos(imagen,threshold=140):
     img=img[:,:,1] # Tomar la Capa Verde
     threshold=120
     out = ApplyMask(img)
-    #cv2.imwrite("enmascaradaEinvertida.png", out)
 
     """
     Parametros de la funcion Morlet
