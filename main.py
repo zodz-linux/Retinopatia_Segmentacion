@@ -2,16 +2,17 @@
 # -*- coding: utf-8 -*-
 
 import os
-from funciones.transformadaMorlet import *
 import matplotlib.pyplot as plt
-from funciones.groundtruth import *
-from funciones.segmentacion import *
-from funciones.preprocesamiento import *
+from functions.transformadaMorlet import *
+from functions.groundtruth import *
+from functions.segmentacion import *
+from functions.preprocesamiento import *
 
 ########## Varibles Globales
 outPath      =(os.getcwd()+"/OutputImages/")
 outPathLesion=(os.getcwd()+"/OutputImages/Lesions/")
-imagesPath   =(os.getcwd()+"/images/")
+imagesPath   =(os.getcwd()+"/Images/")
+mask1        =(os.getcwd()+"/Images/mask1.png")
 ############################
 
 def SegmentarVasos(imagen,threshold=140):
@@ -19,8 +20,7 @@ def SegmentarVasos(imagen,threshold=140):
     img= cv2.imread(imagesPath+imagen) # Cargar Imagen
     img=img[:,:,1] # Tomar la Capa Verde
     threshold=120
-    out = ApplyMask(img)
-
+    out = ApplyMask(img,mask1)
     """
     Parametros de la funcion Morlet
     """
@@ -33,7 +33,7 @@ def SegmentarVasos(imagen,threshold=140):
     print " \tPreprocesando        "+imagen
     wavelet = cvgpi.generate(out)
 
-    mask = cv2.imread('mask1.png') #cargar mascara
+    mask = cv2.imread(imagesPath+'mask1.png') #cargar mascara
     mask = mask[:, :, 1]    # Load mask
     wavelet = cv2.bitwise_and(wavelet.real, wavelet.real, mask = mask) # Maskingaxxxxxxx
 
