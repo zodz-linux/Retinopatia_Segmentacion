@@ -24,16 +24,20 @@ class CVGaborProcessedImage(object):
         current = np.zeros((dft_M, dft_N), dtype='complex')
 
         # Apply the continuous wavelet transform
-        maximum = np.zeros((dft_M, dft_N), dtype='float32')
+#        maximum = np.zeros((dft_M, dft_N), dtype='float32')
+#        iMaximum = np.zeros((dft_M, dft_N), dtype='float32')
+
+        maximum = np.finfo(np.float32).min * \
+                  np.ones((dft_M, dft_N), dtype='float32')
         iMaximum = np.zeros((dft_M, dft_N), dtype='float32')
 
-        for i in xrange(18):
+        for multiplier in xrange(18):
 
             # Generate the wavelet complex image
-            angle = i * 10.0 # in degrees
-
-            #print('Morlet (scale = {}, epsilon = {}, theta = {}, k0 = [0, {}])'.
-            #      format(self.scale, self.epsilon, angle, self.k0y))
+            angle = multiplier * 10.0 # in degrees
+            print "\x1b[1A"+"\x1b[2K",#solo elimina una linea del std out
+            print('\t*Morlet (scale = {}, epsilon = {}, theta = {}, k0 = [0, {}])'.
+                  format(self.scale, self.epsilon, angle, self.k0y))
 
             wavelet = self.morlet(waveletSize, waveletSize, angle,
                 self.scale, self.epsilon, 0.0, self.k0y)
@@ -46,7 +50,7 @@ class CVGaborProcessedImage(object):
             dft_A[yWaveletCentered:yWaveletCentered + wavelet_height,
                   xWaveletCentered:xWaveletCentered + wavelet_width] =\
                   wavelet[0:wavelet_height, 0:wavelet_width]
-            dft_A = np.fft.fft2(dft_A) #, [(wavelet_height + dft_M) / 2, (wavelet_width + dft_N) / 2])
+            dft_A = np.fft.fft2(dft_A)
 
             # Multiply the source image and the wavelet image in the frequency domain
             current = dft_B * np.conjugate(dft_A)
@@ -55,9 +59,9 @@ class CVGaborProcessedImage(object):
             iCurrent = np.fft.ifft2(current, [dft_M, dft_N])
 
             # Create the resulting feature image
-            (iCurrent_height, iCurrent_width) = iCurrent.shape
-            for i in xrange(iCurrent_height):
-                for j in xrange(iCurrent_width):
+            (current_height, current_width) = current.shape
+            for i in xrange(current_height):
+                for j in xrange(current_width):
                     iCurrent[i][j] /= self.scale
 #                    iCurrent[i][j].real = (iCurrent[i][j].real / self.scale)
 #                    iCurrent[i][j].imag = (iCurrent[i][j].imag / self.scale)
@@ -65,13 +69,14 @@ class CVGaborProcessedImage(object):
                     im = iCurrent[i][j].imag
 
                     # Calculate the modulus of this pixel
-                    iCurrent[i][j] = np.sqrt(re*re + im*im)
+                    iCurrent[i][j] = np.sqrt(re*re + im*im) + 0.j
 #                    iCurrent[i][j].real = sqrt(re*re + im*im)
 #                    iCurrent[i][j].imag = 0.0
 
                     # Store the maximum of the modulus on this pixel
                     if iCurrent[i][j].real > iMaximum[i][j]:
                         iMaximum[i][j] = iCurrent[i][j].real
+
 
         # Shifts the resulting image to obtain the correct image
         iMaximum = np.fft.fftshift(iMaximum)
@@ -150,8 +155,8 @@ class CVGaborProcessedImage(object):
         RETURNS
         The resulting image.'''
 
-        complexMorlet = np.zeros((width, height), dtype=np.complex)
-        theta = (angle / 180.0) * np.pi;
+        complexMorlet = np.zeros((width, height), dtype='complex64')
+        theta = np.pi * angle / 180.0;
 
         W = width / 2
         H = height / 2

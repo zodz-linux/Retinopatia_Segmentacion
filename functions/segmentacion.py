@@ -1,9 +1,9 @@
 import os
 import numpy as np
 import  cv2
-from preprocesamiento import *
+from preprocesador import *
 
-def skeletonize(img):
+def Skeletonize(img):
     """ OpenCV function to return a skeletonized version of img, a Mat object"""
     img = img.copy() # don't clobber original
     skel = img.copy()
@@ -62,6 +62,12 @@ def Thresholding(image,threshold):
             else:
                 binary_image[i,j]=0
     return binary_image
+
+
+def FastThresHolding(image,threshold,multiplayer=1):
+    res=(image > threshold).astype(np.int)
+    res*=multiplayer
+    return res
 
 def ExtremePoints(image):
     h,k=image.shape
@@ -184,39 +190,20 @@ def CalculateDifference(image_i,image_j,image_mask,threshold,MinDiff=2):
             image_mask[p[0],p[1]]=threshold
         return image_mask, ContinueIteration
 
-def SingleSegmentation(imagex):
-    img = cv2.imread("Images/"+imagex) # read file
-    image= preprocesar(img) #preprocesar
-    threshold=image.max() #inicializar umbral
-    thresholded = Thresholding(image,threshold)
-    print "\tUmbral Actual: ",threshold
-    mask=thresholded.copy()
-    skel=skeletonize(thresholded)
-    binary = Binarization(skel,1)
-    ep=ExtremePoints(binary)
-    I_i_segmented=RemoveShortSegments(ep,11)
-    threshold=threshold-1
-    ContinueIteration=True
-    iteracion=1
-    while True:
-        serie=str(iteracion)
-        if iteracion < 10:
-            serie="00"+str(iteracion)
-        if iteracion > 9 and iteracion< 100 :
-            serie="0"+str(iteracion)
-        cv2.imwrite("OutputImages/ByThreshold/"+imagex[:-4]+"_"+serie+".png",mask)
-        print "\t\t Iteracion: ",iteracion
-        print "\tUmbral Actual: ",threshold
-        thresholded = Thresholding(image,threshold)
-        skel=skeletonize(thresholded)
-        binary = Binarization(skel,1)
-        ep=ExtremePoints(binary)
-        I_j_segmented=RemoveShortSegments(ep,11)
-        mask,ContinueIteration=CalculateDifference(I_i_segmented,I_j_segmented,mask,threshold,5)
-        threshold=threshold-1
-        iteracion+=1
-        if not(ContinueIteration) or (threshold==0):
-            print "ContinueIteration: ",ContinueIteration
-            print "Umbral:            ",threshold
-            return mask
-        I_i_segmented=I_j_segmented.copy()
+
+def  VaildateByNeighbors(image_i,image_j,new_points=10):
+    neighbors=[[-1,-1],[0,-1],[1,-1],[1,0],[1,1],[0,1],[-1,1],[-1,0]]
+    auxiliar=image_j-image_i
+    H,W=auxiliar.shape
+    points=[]
+    for i in xrange(1,H-1):
+        for j in xrange(1,W-1):
+            if auxiliar[i,j] > 0:
+                for index in neighbors:
+                    if image_i[i+index[0],j+index[1]] > 0:
+                        points.append((i,j))
+    points=set(points)
+    if len(points) > new_points:
+        return points
+    else:
+        return []
